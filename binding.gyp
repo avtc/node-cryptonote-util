@@ -38,6 +38,10 @@
                 "libraries": [
                     "-lboost_system",
                     "-lboost_date_time",
+					"-lboost_thread",
+					"-lboost_filesystem",
+					"-lboost_regex",
+					"-lboost_program_options",
                 ]
             },
             "cflags_cc!": [ "-fno-exceptions", "-fno-rtti" ],
