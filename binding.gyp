@@ -5,7 +5,7 @@
             "sources": [
                 "src/main.cc",
                 "src/cryptonote_core/cryptonote_format_utils.cpp",
-                "src/cryptonote_core/cryptonote_basic_impl.cpp"
+                "src/cryptonote_core/cryptonote_basic_impl.cpp",
                 "src/crypto/tree-hash.c",
                 "src/crypto/crypto.cpp",
                 "src/crypto/crypto-ops.c",
