@@ -96,9 +96,9 @@ NAN_METHOD(convert_blob) {
     //convert
     block b = AUTO_VAL_INIT(b);
     if (!parse_and_validate_block_from_blob(input, b))
-        return THROW_ERROR_EXCEPTION("Failed to parse block");
+        return THROW_ERROR_EXCEPTION("Failed to parse block (convert_blob)");
 
-    if (b.major_version < BLOCK_MAJOR_VERSION_2) {
+    if (b.major_version == BLOCK_MAJOR_VERSION_1 || b.major_version > BLOCK_MAJOR_VERSION_3) {
         if (!get_block_hashing_blob(b, output))
             return THROW_ERROR_EXCEPTION("Failed to create mining block");
     } else {
@@ -108,7 +108,7 @@ NAN_METHOD(convert_blob) {
 
         if (!get_block_hashing_blob(parent_block, output))
             return THROW_ERROR_EXCEPTION("Failed to create mining block");
-    }
+    }  
 
     v8::Local<v8::Value> returnValue = Nan::CopyBuffer((char*)output.data(), output.size()).ToLocalChecked();
     info.GetReturnValue().Set(
@@ -131,7 +131,7 @@ void get_block_id(const Nan::FunctionCallbackInfo<v8::Value>& info) {
 
     block b = AUTO_VAL_INIT(b);
     if (!parse_and_validate_block_from_blob(input, b))
-        return THROW_ERROR_EXCEPTION("Failed to parse block");
+        return THROW_ERROR_EXCEPTION("Failed to parse block (get_block_id)");
 
     crypto::hash block_id;
     if (!get_block_hash(b, block_id))
@@ -165,19 +165,10 @@ void construct_block_blob(const Nan::FunctionCallbackInfo<v8::Value>& info) {
 
     block b = AUTO_VAL_INIT(b);
     if (!parse_and_validate_block_from_blob(block_template_blob, b))
-        return THROW_ERROR_EXCEPTION("Failed to parse block");
+        return THROW_ERROR_EXCEPTION("Failed to parse block (construct_block_blob)");
 
     b.nonce = nonce;
-    if (b.major_version == BLOCK_MAJOR_VERSION_2) {
-        block parent_block;
-        b.parent_block.nonce = nonce;
-        if (!construct_parent_block(b, parent_block))
-            return THROW_ERROR_EXCEPTION("Failed to construct parent block");
-
-        if (!mergeBlocks(parent_block, b, std::vector<crypto::hash>()))
-            return THROW_ERROR_EXCEPTION("Failed to postprocess mining block");
-    }
-    if (b.major_version == BLOCK_MAJOR_VERSION_3) {
+    if (b.major_version == BLOCK_MAJOR_VERSION_2 || b.major_version == BLOCK_MAJOR_VERSION_3) {
         block parent_block;
         b.parent_block.nonce = nonce;
         if (!construct_parent_block(b, parent_block))
